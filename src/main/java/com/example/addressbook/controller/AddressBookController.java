@@ -1,6 +1,6 @@
 package com.example.addressbook.controller;
 
-import com.example.addressbook.model.Contact;
+import com.example.addressbook.dto.ContactDTO;
 import com.example.addressbook.service.AddressBookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,24 +16,24 @@ public class AddressBookController {
     private AddressBookService addressBookService;
 
     @GetMapping
-    public ResponseEntity<List<Contact>> getAllContacts() {
+    public ResponseEntity<List<ContactDTO>> getAllContacts() {
         return ResponseEntity.ok(addressBookService.getAllContacts());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Contact> getContactById(@PathVariable Long id) {
-        Contact contact = addressBookService.getContactById(id);
+    public ResponseEntity<ContactDTO> getContactById(@PathVariable Long id) {
+        ContactDTO contact = addressBookService.getContactById(id);
         return contact != null ? ResponseEntity.ok(contact) : ResponseEntity.notFound().build();
     }
 
     @PostMapping
-    public ResponseEntity<Contact> addContact(@RequestBody Contact contact) {
-        return ResponseEntity.ok(addressBookService.addContact(contact));
+    public ResponseEntity<ContactDTO> addContact(@RequestBody ContactDTO contactDTO) {
+        return ResponseEntity.ok(addressBookService.addContact(contactDTO));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Contact> updateContact(@PathVariable Long id, @RequestBody Contact contact) {
-        Contact updatedContact = addressBookService.updateContact(id, contact);
+    public ResponseEntity<ContactDTO> updateContact(@PathVariable Long id, @RequestBody ContactDTO contactDTO) {
+        ContactDTO updatedContact = addressBookService.updateContact(id, contactDTO);
         return updatedContact != null ? ResponseEntity.ok(updatedContact) : ResponseEntity.notFound().build();
     }
 
