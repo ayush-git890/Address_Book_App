@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import com.example.addressbook.dto.ContactDTO;
+import com.example.addressbook.event.EventPublisher;
 import com.example.addressbook.model.Contact;
 
 import java.util.ArrayList;
@@ -19,6 +20,9 @@ public class ContactService {
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
+    @Autowired
+    private EventPublisher eventPublisher;
+
     private static final String CACHE_KEY = "ContactList";
 
     // Add Contact
@@ -28,18 +32,21 @@ public class ContactService {
                 contactDTO.getEmail());
         contactList.add(contact);
 
-        // Clear cache after adding a new contact
+        // Clear Redis Cache
         redisTemplate.delete(CACHE_KEY);
+
+        // 🔥 Publish Event to RabbitMQ
+        eventPublisher.publishContactAddedEvent(contactDTO.getName());
+
         return contact;
     }
 
     // Get All Contacts with Redis Cache
     public List<Contact> getAllContacts() {
-        // Check if data is in Redis Cache
         List<Contact> cachedContacts = (List<Contact>) redisTemplate.opsForValue().get(CACHE_KEY);
 
         if (cachedContacts != null) {
-            System.out.println("Fetching from Redis Cache");
+            System.out.println("Fetching from Redis Cache ");
             return cachedContacts;
         }
 
@@ -62,8 +69,6 @@ public class ContactService {
             Contact contact = existingContact.get();
             contact.setName(contactDTO.getName());
             contact.setEmail(contactDTO.getEmail());
-
-            // Clear cache after update
             redisTemplate.delete(CACHE_KEY);
             return contact;
         }
@@ -73,8 +78,6 @@ public class ContactService {
     // Delete Contact By ID
     public void deleteContact(Long id) {
         contactList.removeIf(contact -> contact.getId().equals(id));
-
-        // Clear cache after deletion
         redisTemplate.delete(CACHE_KEY);
     }
 }
