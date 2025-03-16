@@ -3,14 +3,12 @@ package com.example.addressbook.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Entity
-@Table(name = "contacts")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
-public class Contact {
+@Entity
+@Table(name = "users")
+public class Contact{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,11 +16,11 @@ public class Contact {
 
     private String name;
     private String email;
-    private String phone;
+    private String password;
 
-    public Contact(String name, String email, String phone) {
+    public Contact(long id, String name, String email) {
+        this.id = id;
         this.name = name;
         this.email = email;
-        this.phone = phone;
     }
 }

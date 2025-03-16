@@ -2,14 +2,11 @@ package com.example.addressbook.dto;
 
 import lombok.*;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
-public class ContactDTO {
-    private Long id;
+public class ContactDTO{
     private String name;
     private String email;
-    private String phone;
+    private String password;
 }
