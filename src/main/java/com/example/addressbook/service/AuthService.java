@@ -10,6 +10,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class AuthService {
@@ -22,6 +23,9 @@ public class AuthService {
 
     @Autowired
     private JWTUtil jwtUtil;
+
+    @Autowired
+    private EmailService emailService;
 
     public Contact registerUser(ContactDTO userDTO) {
         Contact user = new Contact();
@@ -37,5 +41,33 @@ public class AuthService {
             return jwtUtil.generateToken(user.get().getEmail());
         }
         return "Invalid Credentials";
+    }
+
+    public String forgotPassword(String email) {
+        Optional<Contact> user = userRepository.findByEmail(email);
+        if (user.isPresent()) {
+            String token = UUID.randomUUID().toString();
+            user.get().setResetToken(token);
+            userRepository.save(user.get());
+
+            String resetLink = "http://localhost:8080/api/auth/reset-password?token=" + token;
+
+            // Send Reset Link via Email
+            emailService.sendEmail(email, "Reset Your Password", "Click here to reset your password: " + resetLink);
+
+            return "Reset Password Email Sent!";
+        }
+        return "User Not Found!";
+    }
+
+    public String resetPassword(String token, String newPassword) {
+        Optional<Contact> user = userRepository.findByResetToken(token);
+        if (user.isPresent()) {
+            user.get().setPassword(passwordEncoder.encode(newPassword));
+            user.get().setResetToken(null); // Remove Token after Reset
+            userRepository.save(user.get());
+            return "Password Reset Successfully!";
+        }
+        return "Invalid or Expired Token!";
     }
 }

@@ -17,6 +17,7 @@ public class Contact{
     private String name;
     private String email;
     private String password;
+    private String resetToken; // For Reset Password Token
 
     public Contact(long id, String name, String email) {
         this.id = id;

@@ -22,4 +22,15 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestParam String email, @RequestParam String password) {
         return ResponseEntity.ok(authService.loginUser(email, password));
     }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestParam String email) {
+        return ResponseEntity.ok(authService.forgotPassword(email));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestParam String token, @RequestParam String newPassword) {
+        return ResponseEntity.ok(authService.resetPassword(token, newPassword));
+    }
+
 }
